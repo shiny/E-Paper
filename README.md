@@ -8,3 +8,5 @@
 
 ## 配置文件格式
 配置文件为存放在素材库下，名字为`配置.json`的文件。
+
+![](http://ws2.sinaimg.cn/large/74310c3dly1fwyvy7c32gj21f40xc0vk.jpg)
