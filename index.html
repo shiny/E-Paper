@@ -2,18 +2,134 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>文书电子化工具</title>
+    <link rel="stylesheet" href="./node_modules/element-ui/lib/theme-chalk/index.css" />
+    <style>
+    body{-webkit-touch-callout:none;font-family:-apple-system-font,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei UI","Microsoft YaHei",Arial,sans-serif;color:#333;letter-spacing:.034em}
+    html, body, #app, .app-container {
+      min-height: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      margin: 0;
+    }
+    .menu, .menu > .el-menu{
+      height: 100%;
+    }
+    .logo{
+      position: fixed;
+      bottom: 20px;
+      left: 30px;
+      width: 100%;
+      font-size: 12px;
+    }
+    .logo img{
+      width: 40px;
+      height: 19px;
+      vertical-align: text-bottom;
+      color: #555;
+    }
+    .el-menu-item{
+      border-left: solid 6px transparent; 
+    }
+    .el-menu-item.is-active{
+      border-left: solid 6px #409EFF;
+      background-color: #ecf5ff;
+    }
+    </style>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-
-    <script>
-      // You can also require other files to run in this process
-      require('./renderer.js')
-    </script>
+    <div id="app">
+      <el-container class="app-container">
+          <el-aside class="menu" width="200px">
+            <el-menu
+              :default-active="currentPage">
+              <el-menu-item index="import" @click="handleOpen('import')">
+                <i class="el-icon-menu"></i>
+                <span slot="title">数据导入 
+                  <el-badge 
+                    v-show="tableData.length > 0" 
+                    :value="tableData.length" 
+                    class="item" />
+                </span>
+              </el-menu-item>
+              <el-menu-item index="export" @click="handleOpen('export')">
+                <i class="el-icon-location"></i>
+                <span slot="title">公函生成</span>
+              </el-menu-item>
+            </el-menu>
+            <div class="logo">
+              <img src="logo.jpg" />
+              文书电子化工具
+            </div>
+          </el-aside>
+          <el-container>
+            <el-main v-show="currentPage === 'import'">
+              <el-row>
+                <el-col :span="20">
+                  <el-input v-model="filePath" placeholder="请选择包含信息的 Excel 文件"></el-input>
+                </el-col>
+                <el-col :span="4">
+                  <el-button @click="selectFile()" type="primary">选择文件</el-button>
+                </el-col>
+              </el-row>
+              <el-table
+                  :data="tableData"
+                  empty-text="请先选择文件">
+                <el-table-column 
+                  :label="row"
+                  :prop="row"
+                  :key="key"
+                  v-for="(row, key) in fields">
+                </el-table-column>
+              </el-table>
+              <canvas id="canvas"></canvas>
+            </el-main>
+            <el-main v-show="currentPage === 'export'">
+              <el-form label-width="80px">
+                <el-form-item label="素材目录">
+                  <el-row>
+                    <el-col :span="20">
+                      <el-input v-model="stampDir" placeholder="素材所在的目录"></el-input>
+                    </el-col>
+                    <el-col :span="3">
+                      <el-button @click="selectDir('stampDir')" type="primary">选择目录</el-button>
+                    </el-col>
+                  </el-row>
+                </el-form-item>
+                <el-form-item label="导出目录">
+                  <el-row>
+                    <el-col :span="20">
+                      <el-input v-model="exportDir" placeholder="保存的路径"></el-input>
+                    </el-col>
+                    <el-col :span="3">
+                      <el-button @click="selectDir('exportDir')" type="primary">选择目录</el-button>
+                    </el-col>
+                  </el-row>
+                </el-form-item>
+                <el-form-item label="类型">
+                  <el-select v-model="exportType" placeholder="请选择导出公函类型">
+                    <el-option
+                      v-for="item in types"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item>
+                  <el-progress style="width: 300px;" v-if="loading || done" :status="done ? 'success' : ''" :percentage="parseFloat((progress.finished / progress.total * 100).toFixed(1))"></el-progress>
+                </el-form-item>
+                <el-form-item>
+                  <el-button :disabled="!hasReady" @click="convert" type="danger">一键生成</el-button>
+                  <a v-if="progress.finished > 0" style="cursor:pointer; margin-left: 20px; font-size: 12px; color: #002f81; text-decoration: underline" @click="openExportDir">打开生成目录</a>
+                </el-form-item>
+              </el-form>
+            </el-main>
+          </el-container>
+      </el-container>
+    </div>
   </body>
+  <script>
+    require('./renderer.js')
+//       console.log(element)
+  </script>
 </html>
