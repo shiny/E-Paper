@@ -156,10 +156,18 @@ new Vue({
               });
             break;
             case '盖章':
-              if(!row[name]) {
+            case '签名':
+              let companyName = '';
+              if (placeholder.value) {
+                companyName = placeholder.value.trim();
+              } else if (row[name]) {
+                companyName = row[name].trim();
+              } else {
                 continue;
               }
-              const companyName = row[name].trim();
+              if(type === '盖章' && !style.transform) {
+                style.transform = `rotate(${(Math.random() * 360).toFixed(2)}deg)`;
+              }
               elements.push({
                 html: `<img style="max-width: 100%; max-height: 100%;" src="${dir}/${companyName}.png" />`,
                 style: this.getStyles(style),
