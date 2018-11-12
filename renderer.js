@@ -87,7 +87,7 @@ new Vue({
     async convert() {
       this.progress.total = 0;
       this.progress.finished = 0;
-      // this.cfg.types[0].pages[0].placeholders = 
+      //this.cfg.types[1].pages[0].placeholders[0] = ;
       this.loading = true;
       const stampDir = this.stampDir;
       const exportDir = this.exportDir;
@@ -136,7 +136,7 @@ new Vue({
             break;
             case 'year':
               elements.push({
-                html: ((new Date).getYear()),
+                html: ((new Date).getFullYear()),
                 style: this.getStyles(style),
                 type
               });
