@@ -8,7 +8,7 @@ const fs = require('fs');
 
 Vue.use(ElementUI);
 const { ipcRenderer } = require('electron');
-const htmlStyles = `<style> body{-webkit-touch-callout:none;font-family:-apple-system-font,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei UI","Microsoft YaHei",Arial,sans-serif;color:#000;letter-spacing:.034em} </style>`;
+const htmlStyles = `<style> body{-webkit-touch-callout:none;font-family:-apple-system-font,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei UI","Microsoft YaHei",Arial,sans-serif;color:#000;letter-spacing:.034em; padding:0; margin:0;} </style>`;
 new Vue({
   el: '#app',
   data: function() {
@@ -78,6 +78,17 @@ new Vue({
         });
       });
     },
+    getTypeCfg() {
+      if(!this.cfg.types) {
+        return;
+      }
+      for(let type of this.cfg.types) {
+        if (type.name === this.exportType) {
+          return type;
+        }
+      }
+      return {};
+    },
     toImg() {
       var canvas = document.getElementById("canvas");
       canvas.width = 1000;
@@ -85,6 +96,7 @@ new Vue({
       rasterizeHTML.drawHTML(this.html, canvas);
     },
     async convert() {
+      this.readDocCfg();
       this.progress.total = 0;
       this.progress.finished = 0;
       //this.cfg.types[1].pages[0].placeholders[0] = ;
@@ -177,13 +189,12 @@ new Vue({
           }
         }
         let html = `${htmlStyles}
-        <div style="position:relative">
+        <div style="position:absolute; top:0; left:0; width: ${width}; height: ${height}">
           <img style="width: ${width}; height: ${height}" src="${dir}/${fileName}" />`;
         for(let item of elements) {
           html += `<div style="position:absolute; ${item.style}">${item.html}</div>`;
         }
         html += '</div>';
-        console.log(html);
         rasterizeHTML.drawHTML(html, canvas)
         .then(res => {
           context.drawImage(res.image, width, height);
@@ -242,7 +253,6 @@ new Vue({
         }
       }
       this.tableData = tableData;
-      console.log(tableData);
     },
     handleOpen(key) {
       if(this.currentPage === key) {
@@ -278,6 +288,9 @@ new Vue({
       if(row['原始ID']) {
         return `${row.账号名称}-${row.原始ID}`;
       }
+      if(row['甲方']) {
+        return `${row.甲方}`;
+      }
       return '其他'
     },
     getStyles(styles) {
@@ -295,7 +308,6 @@ new Vue({
         cfg = {};
       }
       cfg[key] = value;
-      console.log(JSON.stringify(cfg));
       return window.localStorage.setItem('cfg', JSON.stringify(cfg));
     },
     readAllCfg () {
@@ -307,16 +319,19 @@ new Vue({
         return false;
       }
       const cfgFile = `${this.stampDir}/配置.js`;
+      if(require.cache[cfgFile]) {
+        delete require.cache[cfgFile];
+      }
       if (fs.existsSync(cfgFile)) {
         const { cfg } = require(cfgFile);
         this.cfg = cfg;
+        this.$set(this.cfg, 'types', cfg.types);
       } else {
         return false;
       }
     },
     loadAllCfg() {
       let cfg = this.readAllCfg();
-      console.log(cfg);
       if(!cfg) {
         return;
       }
