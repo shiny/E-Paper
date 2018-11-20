@@ -131,7 +131,7 @@ new Vue({
         canvas.height = height;
         const elements = [];
         for(let placeholder of pageCfg.placeholders) {
-          let { type, name, style } = placeholder;
+          let { type, name, style, randomRange } = placeholder;
           if (publicStyle) {
             style = Object.assign({}, publicStyle, style);
           }
@@ -168,6 +168,7 @@ new Vue({
               });
             break;
             case '盖章':
+            case '仿真盖章':
             case '签名':
               let companyName = '';
               if (placeholder.value) {
@@ -179,6 +180,13 @@ new Vue({
               }
               if(type === '盖章' && !style.transform) {
                 style.transform = `rotate(${(Math.random() * 360).toFixed(2)}deg)`;
+              }
+              if (type === '仿真盖章') {
+                const [ x = 4, y = 4 ] = randomRange;
+                style.transform = `rotate(${(Math.random() * 360).toFixed(2)}deg)`;
+                style.marginTop = parseFloat(Math.random() * y) + '%';
+                style.marginLeft = parseFloat(Math.random() * x) + '%';
+                console.log(x, y);
               }
               elements.push({
                 html: `<img style="max-width: 100%; max-height: 100%;" src="${dir}/${companyName}.png" />`,
