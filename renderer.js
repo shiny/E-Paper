@@ -89,6 +89,17 @@ new Vue({
       }
       return {};
     },
+    getPicFile(dir, name) {
+      const file = `${dir}/${name}.png`;
+      if(fs.existsSync(file)) {
+        return file;
+      } else {
+        const files = fs.readdirSync(dir);
+        const filtedFiles = files.filter(file => file.startsWith(name));
+        const randomIdx = Math.floor(Math.random() * filtedFiles.length);
+        return `${dir}/${filtedFiles[randomIdx]}`;
+      }
+    },
     toImg() {
       var canvas = document.getElementById("canvas");
       canvas.width = 1000;
@@ -188,8 +199,9 @@ new Vue({
                 style.marginLeft = parseFloat(Math.random() * x) + '%';
                 console.log(x, y);
               }
+              const file = this.getPicFile(dir, companyName);
               elements.push({
-                html: `<img style="max-width: 100%; max-height: 100%;" src="${dir}/${companyName}.png" />`,
+                html: `<img style="max-width: 100%; max-height: 100%;" src="${file}" />`,
                 style: this.getStyles(style),
                 type
               });
@@ -229,13 +241,21 @@ new Vue({
       }
     },
     selectDir(type) {
+      let defaultPath = '';
+      if(this[type]) {
+        defaultPath = this[type];
+      }
       const dirs = dialog.showOpenDialog({
         title: '选择目录',
-        properties: [ 'openDirectory' ]
+        properties: [ 'openDirectory' ],
+        defaultPath
       });
       if(dirs) {
         this[type] = dirs[0];
       }
+    },
+    openurl() {
+      shell.openExternal('http://wx.shouwang.io/doc2xlsx/');
     },
     parseXLSX(file) {
       const workbook = XLSX.readFile(file);

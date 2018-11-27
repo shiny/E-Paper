@@ -35,6 +35,13 @@
       border-left: solid 6px #409EFF;
       background-color: #ecf5ff;
     }
+    .link{
+      cursor:pointer; 
+      margin-left: 20px; 
+      font-size: 12px; 
+      color: #002f81; 
+      text-decoration: underline;
+    }
     </style>
   </head>
   <body>
@@ -58,6 +65,9 @@
               </el-menu-item>
             </el-menu>
             <div class="logo">
+                <div style="margin-bottom: 20px; margin-left: -20px;" @click="openurl">
+                    <a class="link">小工具：Word 转 Excel</a>
+                </div>
               <img src="logo.jpg" />
               文书电子化工具
             </div>
@@ -120,7 +130,7 @@
                 </el-form-item>
                 <el-form-item>
                   <el-button :disabled="!hasReady" @click="convert" type="danger">一键生成</el-button>
-                  <a v-if="progress.finished > 0" style="cursor:pointer; margin-left: 20px; font-size: 12px; color: #002f81; text-decoration: underline" @click="openExportDir">打开生成目录</a>
+                  <a v-if="progress.finished > 0" class="link" @click="openExportDir">打开生成目录</a>
                 </el-form-item>
               </el-form>
             </el-main>
