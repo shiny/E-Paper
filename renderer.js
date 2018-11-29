@@ -127,8 +127,7 @@ new Vue({
             pageCfg,
             row: item
           });
-          let prefix = (parseInt(i)+1);
-          const destDir = `/${dirPrefix}/${prefix}. ` + this.createName(item);
+          const destDir = `/${dirPrefix}/` + this.createName(item);
           this.mkdir(exportDir, destDir);
           fs.writeFileSync(`${exportDir}/${destDir}/${pageCfg.fileName}`, res);
           this.progress.finished++;
