@@ -119,13 +119,16 @@ new Vue({
       this.progress.total = this.tableData.length * typeCfg.pages.length;
       const dirPrefix = this.getDirPrefix();
       for(let pageCfg of typeCfg.pages) {
-        for(let item of this.tableData) {
+        for(let i in this.tableData) {
+          let item = this.tableData[i];
           const res = await this.convertPage({
+            i,
             dir: stampDir,
             pageCfg,
             row: item
           });
-          const destDir = `/${dirPrefix}/` + this.createName(item);
+          let prefix = (parseInt(i)+1);
+          const destDir = `/${dirPrefix}/${prefix}. ` + this.createName(item);
           this.mkdir(exportDir, destDir);
           fs.writeFileSync(`${exportDir}/${destDir}/${pageCfg.fileName}`, res);
           this.progress.finished++;
