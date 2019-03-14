@@ -5,6 +5,7 @@ const XLSX = require('xlsx');
 const { dialog } = require('electron').remote;
 const { shell } = require('electron');
 const fs = require('fs');
+const chokidar = require('chokidar');
 
 Vue.use(ElementUI);
 const { ipcRenderer } = require('electron');
@@ -31,7 +32,8 @@ new Vue({
       },
       cfg: {
         types: []
-      }
+      },
+      watcher: null
     }
   },
   watch: {
@@ -238,8 +240,23 @@ new Vue({
         ]
       });
       if(files) {
+        if(this.filePath) {
+          this.unwatch(this.filePath);
+        }
         this.filePath = files[0];
         this.parseXLSX(this.filePath);
+        this.watch(this.filePath);
+      }
+    },
+    watch(file) {
+      this.watcher = chokidar.watch(file, {}).on('all', (event, path) => {
+        this.parseXLSX(this.filePath);
+      });
+    },
+    unwatch(file) {
+      if(this.watcher) {
+        this.watcher.unwatch(file);
+        this.watcher.close();
       }
     },
     selectDir(type) {
@@ -372,6 +389,7 @@ new Vue({
     loadFile() {
       if(this.filePath && fs.existsSync(this.filePath)) {
         this.parseXLSX(this.filePath);
+        this.watch(this.filePath);
       }
     },
     saveAllCfg() {
