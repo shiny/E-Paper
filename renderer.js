@@ -283,6 +283,7 @@ new Vue({
       const theFirstSheet = workbook.Sheets[theFirstSheetName];
       const cellNames = Object.keys(theFirstSheet).filter( name => !name.startsWith('!') );
       const tableData = [];
+      this.fields = [];
       for(let cellName of cellNames) {
         const [, col, row] = cellName.match(/([A-Z]+)([0-9]+)/);
         const index = parseInt(row);
