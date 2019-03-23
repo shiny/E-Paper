@@ -253,7 +253,8 @@ new Vue({
         this.parseXLSX(this.filePath);
       });
     },
-    unwatch(file) {
+    unwatch(file) {return
+      console.log(this.watcher)
       if(this.watcher) {
         this.watcher.unwatch(file);
         this.watcher.close();
