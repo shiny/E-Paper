@@ -97,7 +97,9 @@ new Vue({
         return file;
       } else {
         const files = fs.readdirSync(dir);
-        const filtedFiles = files.filter(file => file.startsWith(name));
+        const filtedFiles = files.filter(file => {
+          return file.startsWith(`${name}-`) || file.startsWith(`${name}_`);
+        });
         const randomIdx = Math.floor(Math.random() * filtedFiles.length);
         return `${dir}/${filtedFiles[randomIdx]}`;
       }
@@ -129,7 +131,7 @@ new Vue({
             pageCfg,
             row: item
           });
-          const destDir = `/${dirPrefix}/` + this.createName(item);
+          const destDir = `/${dirPrefix}/` + this.createName({ typeCfg, item });
           this.mkdir(exportDir, destDir);
           fs.writeFileSync(`${exportDir}/${destDir}/${pageCfg.fileName}`, res);
           this.progress.finished++;
@@ -185,11 +187,16 @@ new Vue({
             case '盖章':
             case '仿真盖章':
             case '签名':
+              let rowName = row[name];
               let companyName = '';
               if (placeholder.value) {
                 companyName = placeholder.value.trim();
-              } else if (row[name]) {
-                companyName = row[name].trim();
+                if (rowName) {
+                  rowName = rowName.trim();
+                }
+                companyName = companyName.replace(/\$\{value\}/g, rowName);
+              } else if (rowName) {
+                companyName = rowName.trim();
               } else {
                 continue;
               }
@@ -330,7 +337,13 @@ new Vue({
         }
       }
     },
-    createName(row) {
+    createName({ typeCfg, item: row }) {
+      console.log(typeCfg);
+      if (typeCfg.folderName) {
+        return typeCfg.folderName.replace(/\$\{([^}]+)\}/g, function(match, p1) {
+          return row[p1];
+      });
+      }
       if(row['原账号名称']) {
         return `${row.原账号名称}-${row.原账号原始ID}`;
       }
