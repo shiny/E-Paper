@@ -16,7 +16,7 @@
     "element-ui": "^2.4.9",
     "rasterizehtml": "^1.3.0",
     "vue": "^2.5.17",
-    "xlsx": "^0.14.0"
+    "xlsx": "^0.17.0"
   },
   "build": {
     "appId": "com.keqin.app",
