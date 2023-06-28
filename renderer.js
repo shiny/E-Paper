@@ -381,8 +381,8 @@ new Vue({
         return false;
       }
       const cfgFile = `${this.stampDir}/配置.js`;
-      if(require.cache[cfgFile]) {
-        delete require.cache[cfgFile];
+      if(require.cache[require.resolve(cfgFile)]) {
+        delete require.cache[require.resolve(cfgFile)];
       }
       if (fs.existsSync(cfgFile)) {
         const { cfg } = require(cfgFile);
